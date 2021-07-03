@@ -1,17 +1,16 @@
 import os
 import time
 import urllib.error
+import concurrent.futures #使用這個concurrent模組來將multithreading
 
 from pytube import YouTube
 
 from .step import Step
 from .step import StepException
 
-
-
-
 class DownloadCaptions(Step):
     def process(self, data, inputs, utils):
+        print('concurrent.futures')
         start = time.time()
         for yt in data:
             if utils.caption_file_exists(yt):
@@ -30,15 +29,13 @@ class DownloadCaptions(Step):
                 print('urllib.error.HTTPError when downloading caption for', yt.url)
                 continue
 
-            text_file = open(utils.caption_filepath(yt.url), "w", encoding='utf-8')
+            text_file = open(yt.caption_filepath, "w", encoding='utf-8')
             text_file.write(en_caption_convert_to_srt)
             text_file.close()
 
         end = time.time()
         print('took', end-start, 'seconds')
         return data
-
-
 
 
 
